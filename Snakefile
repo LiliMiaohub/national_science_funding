@@ -30,3 +30,14 @@ rule paper:
         # "data/derived/some_derived_data.csv"
     # script:
         # "workflow/scripts/process_some_data.py"
+        
+rule compile_data
+
+rule cntry_fund_frac
+
+rule cntry_fund_full
+
+rule plot_globalfund
+
+rule plot_global_patron
+
