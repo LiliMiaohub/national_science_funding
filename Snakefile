@@ -41,3 +41,9 @@ rule plot_globalfund
 
 rule plot_global_patron
 
+rule cntry_author_full
+
+rule cal_profile_change
+
+
+
