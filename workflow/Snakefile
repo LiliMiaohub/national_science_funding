@@ -1,12 +1,36 @@
-from os.path import join as j
+##############################################################
+# main snakefile for the national funding project workflow. Target rules are distributed across the following files:
+# - Snakefile_datacleaning.smk
+#
+#
+#
+#
+##############################################################
 
 configfile: "workflow/config.yaml"
 
-DATA_DIR = config["data_dir"]
+from os.path import join as osjoin
+import pandas as pd
 
+
+"""
+main directories
+"""
+PROJ_DIR = config["proj_home"]
+DATA_DIR = config["data_dir"]
 PAPER_DIR = config["paper_dir"]
+
 PAPER_SRC, SUPP_SRC = [j(PAPER_DIR, f) for f in ("main.tex", "supp.tex")]
 PAPER, SUPP = [j(PAPER_DIR, f) for f in ("main.pdf", "supp.pdf")]
+
+
+
+
+
+
+
+
+
 
 rule all:
     input:
