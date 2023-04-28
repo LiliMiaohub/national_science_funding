@@ -6,6 +6,9 @@ import matplotlib.pyplot as plt
 import geopandas as gp
 import pandas as pd
 from adjustText import adjust_text
+import networkx as nx
+import numpy as np
+from scipy import integrate
 
 def read_geofile(path):
     """read sh file and return the file without Antarctica
@@ -15,7 +18,7 @@ def read_geofile(path):
     world_geo=world_geo[world_geo.WoS!='Antarctica']
     return world_geo
 
-def plot_worldmap(ax, fig, basemap, data, plotcolumn, cmap, vmin, vmax,legend_title):
+def plot_worldmap(ax, fig, basemap, data, plotcolumn, cmap, vmin, vmax):
     """plot a basemap and color the country based on the column passed into
     """
 
@@ -28,7 +31,7 @@ def plot_worldmap(ax, fig, basemap, data, plotcolumn, cmap, vmin, vmax,legend_ti
     sm = plt.cm.ScalarMappable(cmap=cmap, norm=plt.Normalize(vmin=vmin, vmax=vmax))
     sm._A = []
     clb = fig.colorbar(sm, cax=cax)
-    clb.ax.set_title(legend_title)
+    clb.ax.set_title("")
 
     return fig, ax
 
@@ -81,3 +84,66 @@ def plot(df,xcol,ycol,ax,topnlist,yvalues,ylabel):
     ax.set_ylabel(ylabel,fontsize=12)
     ax.set_xlabel("")
     return ax
+
+'''
+This module implements the disparity filter to compute a significance score of edge weights in networks
+The script comes from https://github.com/aekpalakorn/python-backbone-network
+'''
+
+
+
+def disparity_filter(G, weight='weight'):
+    ''' Compute significance scores (alpha) for weighted edges in G as defined in Serrano et al. 2009
+        Args
+            G: Weighted NetworkX graph
+        Returns
+            Weighted graph with a significance score (alpha) assigned to each edge
+        References
+            M. A. Serrano et al. (2009) Extracting the Multiscale backbone of complex weighted networks. PNAS, 106:16, pp. 6483-6488.
+    '''
+    
+    if nx.is_directed(G): #directed case    
+        N = nx.DiGraph()
+        for u in G:
+            
+            k_out = G.out_degree(u)
+            k_in = G.in_degree(u)
+            
+            if k_out > 1:
+                sum_w_out = sum(np.absolute(G[u][v][weight]) for v in G.successors(u))
+                for v in G.successors(u):
+                    w = G[u][v][weight]
+                    p_ij_out = float(np.absolute(w))/sum_w_out
+                    alpha_ij_out = 1 - (k_out-1) * integrate.quad(lambda x: (1-x)**(k_out-2), 0, p_ij_out)[0]
+                    N.add_edge(u, v, weight = w, alpha_out=float('%.4f' % alpha_ij_out))
+                    
+            #elif k_out == 1 and G.in_degree(G.successors(u)[0]) == 1:
+            elif k_out == 1 and G.in_degree(G.successors(u)) == 1:
+                #we need to keep the connection as it is the only way to maintain the connectivity of the network
+                #v = G.successors(u)[0]
+                v = G.successors(u)
+                w = G[u][v][weight]
+                N.add_edge(u, v, weight = w, alpha_out=0., alpha_in=0.)
+                #there is no need to do the same for the k_in, since the link is built already from the tail
+            
+            if k_in > 1:
+                sum_w_in = sum(np.absolute(G[v][u][weight]) for v in G.predecessors(u))
+                for v in G.predecessors(u):
+                    w = G[v][u][weight]
+                    p_ij_in = float(np.absolute(w))/sum_w_in
+                    alpha_ij_in = 1 - (k_in-1) * integrate.quad(lambda x: (1-x)**(k_in-2), 0, p_ij_in)[0]
+                    N.add_edge(v, u, weight = w, alpha_in=float('%.4f' % alpha_ij_in))
+        return N
+    
+    else: #undirected case
+        B = nx.Graph()
+        for u in G:
+            k = len(G[u])
+            if k > 1:
+                sum_w = sum(np.absolute(G[u][v][weight]) for v in G[u])
+                for v in G[u]:
+                    w = G[u][v][weight]
+                    p_ij = float(np.absolute(w))/sum_w
+                    alpha_ij = 1 - (k-1) * integrate.quad(lambda x: (1-x)**(k-2), 0, p_ij)[0]
+                    B.add_edge(u, v, weight = w, alpha=float('%.4f' % alpha_ij))
+        return B

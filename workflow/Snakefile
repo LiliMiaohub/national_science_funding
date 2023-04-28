@@ -7,67 +7,112 @@
 #
 ##############################################################
 
-configfile: "workflow/config.yaml"
+configfile: "config.yaml"
 
 from os.path import join as osjoin
 import pandas as pd
 
 
-"""
-main directories
-"""
+
+#main directories
 PROJ_DIR = config["proj_home"]
-DATA_DIR = config["data_dir"]
+DATA_DIR = osjoin(PROJ_DIR, 'Data')
+RAW_DATA_DIR = osjoin(DATA_DIR, 'RawData')
+DERIVE_DATA_DIR = osjoin(DATA_DIR, 'DerivedData')
+ADDITIONAL_DATA_DIR = osjoin(DATA_DIR, 'AdditionalData')
 PAPER_DIR = config["paper_dir"]
+FIG_DIR = osjoin(PROJ_DIR, 'Figs', 'Figs')
 
-PAPER_SRC, SUPP_SRC = [j(PAPER_DIR, f) for f in ("main.tex", "supp.tex")]
-PAPER, SUPP = [j(PAPER_DIR, f) for f in ("main.pdf", "supp.pdf")]
-
-
-
+#PAPER_SRC, SUPP_SRC = [j(PAPER_DIR, f) for f in ("main.tex", "supp.tex")]
+#PAPER, SUPP = [j(PAPER_DIR, f) for f in ("main.pdf", "supp.pdf")]
 
 
+#raw data files
+RAW_PUB = osjoin(RAW_DATA_DIR, 'pubs.csv')
+RAW_AUTHOR = osjoin(RAW_DATA_DIR, 'pub_author.csv')
+RAW_FUNDER = osjoin(RAW_DATA_DIR, 'pub_funder.csv')
 
 
+#additional data
+CNTRY_CONVERT_DATA = osjoin(ADDITIONAL_DATA_DIR, 'cntry_convert.xlsx')
+CNTRY_FLAG_DATA = osjoin(ADDITIONAL_DATA_DIR, 'country_WoS_ECI_WB_flags.tsv')
+CNTRY_REGION_DATA = osjoin(ADDITIONAL_DATA_DIR, 'cntry_region.xlsx')
+WORLD_SHP_PATH = osjoin(ADDITIONAL_DATA_DIR, 'world_map_shp', 'ne_50m_admin_0_countries.shp')
+
+
+#cleaned raw data
+PUB_DATA = osjoin(DERIVE_DATA_DIR, 'CleanedRawData', 'pub.pkl')
+#Funding by fractional counting
+CNTRY_FUND_FRAC = osjoin(DERIVE_DATA_DIR, 'Derived', 'cntry_fund_frac.csv')
+#Research profile without international funding
+PUB_NOINT_FUND_FILE = osjoin(DERIVE_DATA_DIR, 'Derived','dependence','pub_noint_fund.csv')
+#number of publication of countries using full counting assignment
+CNTRY_AUTHOR_FULL = osjoin(DERIVE_DATA_DIR, 'Derived', 'cntry_author_full.csv')
+#country's research profile without publications that are funded by the top20 countries
+PUB_NOFOREIGN_TOP20 = osjoin(DERIVE_DATA_DIR, 'Derived','dependence', 'pub_noforeign_fund_top20.csv')
+#Funding units flow between countries
+FUNDING_UNIT_FLOW = osjoin(DERIVE_DATA_DIR, 'Derived', 'funding_unit_flow.csv')
+#publication reduction of countries if all of countries are removed iteratively
+PUB_NOFOREIGN_ALL2ALL = osjoin(DERIVE_DATA_DIR, 'Derived', 'dependence','pub_noforeign_fund_all2all.csv')
+#backbone network of the publication reduction of all countries to all countries with the alpha equals 0.005
+ALL2ALL_BACKBONE_ALPHA0005 = osjoin(DERIVE_DATA_DIR,'Derived','dependence','all2all_backbone_alpha0005.gexf')
+
+#Plots
+CNTRY_FUND_FRAC_PLOT = osjoin(FIG_DIR, 'cntry_funding_frac.pdf')
+GLOBAL_FUND_PLOT = osjoin(FIG_DIR, 'global_funding.pdf')
+FUNDING_INTENSITY_OVERALL_PLOT = osjoin(FIG_DIR,'funding_intensity_overall.pdf')
+FUNDING_PORTFOLIO_PLOT = osjoin(FIG_DIR, 'funding_portfolio.pdf')
+FUNDING_INTENSITY_SELF_PLOT = osjoin(FIG_DIR,'funding_intensity_self.pdf')
+PUB_REDUCTION_GLOBAL_PLOT = osjoin(FIG_DIR, 'dependence_NoForeignFund','pub_reduction_global.pdf')
+PUB_CHANGE_GLOBAL_PLOT = osjoin(FIG_DIR, 'dependence_NoForeignFund','pub_change_global.pdf')
+PUB_REDUCTION_TOP_PLOT = osjoin(FIG_DIR, 'pub_reduction_by_top10.pdf')
+PROFILECHANGE_TOP_PLOT = osjoin(FIG_DIR, 'profilechange_by_top10.pdf')
+#get top20 countries
+df = pd.read_csv(PUB_NOFOREIGN_TOP20)
+top20list = df.srce_cntry.unique()
+INFLUENCIAL_AREA_PLOT = osjoin(FIG_DIR, "influence_area", "{cntry}.pdf")
+
+#include rules
+include: "Snakefile_dataclean.smk"
+include: "Snakefile_globalfunding.smk"
+include: "Snakefile_intensity.smk"
+include: "Snakefile_dependence.smk"
+include: "Snakefile_impact.smk"
 
 
 
 rule all:
     input:
-        PAPER, SUPP
-
-rule paper:
-    input:
-        PAPER_SRC, SUPP_SRC
-    params:
-        paper_dir = PAPER_DIR
-    output:
-        PAPER, SUPP
-    shell:
-        "cd {params.paper_dir}; make"
-
-
-# rule some_data_processing:
-    # input:
-        # "data/some_data.csv"
-    # output:
-        # "data/derived/some_derived_data.csv"
-    # script:
-        # "workflow/scripts/process_some_data.py"
+        #PAPER, SUPP
+        PUB_DATA,
+        CNTRY_FUND_FRAC,
+        CNTRY_FUND_FRAC_PLOT,
+        GLOBAL_FUND_PLOT,
+        FUNDING_INTENSITY_OVERALL_PLOT,
+        FUNDING_PORTFOLIO_PLOT,
+        FUNDING_INTENSITY_SELF_PLOT,
+        PUB_NOINT_FUND_FILE,
+        CNTRY_AUTHOR_FULL,
+        PUB_REDUCTION_GLOBAL_PLOT,
+        PUB_CHANGE_GLOBAL_PLOT,
+        PUB_NOFOREIGN_TOP20,
+        PUB_REDUCTION_TOP_PLOT,
+        PROFILECHANGE_TOP_PLOT,
+        expand(INFLUENCIAL_AREA_PLOT, cntry=top20list),
+        FUNDING_UNIT_FLOW,
+        PUB_NOFOREIGN_ALL2ALL,
+        ALL2ALL_BACKBONE_ALPHA0005
         
-rule compile_data
 
-rule cntry_fund_frac
+#rule paper:
+#    input:
+#        PAPER_SRC, SUPP_SRC
+#    params:
+#        paper_dir = PAPER_DIR
+#    output:
+#        PAPER, SUPP
+#    shell:
+#        "cd {params.paper_dir}; make"
 
-rule cntry_fund_full
-
-rule plot_globalfund
-
-rule plot_global_patron
-
-rule cntry_author_full
-
-rule cal_profile_change
-
-
+        
 
