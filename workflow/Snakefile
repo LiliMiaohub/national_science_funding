@@ -55,7 +55,9 @@ FUNDING_UNIT_FLOW = osjoin(DERIVE_DATA_DIR, 'Derived', 'funding_unit_flow.csv')
 #publication reduction of countries if all of countries are removed iteratively
 PUB_NOFOREIGN_ALL2ALL = osjoin(DERIVE_DATA_DIR, 'Derived', 'dependence','pub_noforeign_fund_all2all.csv')
 #backbone network of the publication reduction of all countries to all countries with the alpha equals 0.005
-ALL2ALL_BACKBONE_ALPHA0005 = osjoin(DERIVE_DATA_DIR,'Derived','dependence','all2all_backbone_alpha0005.gexf')
+ALL2ALL_BACKBONE_ALPHA = osjoin(DERIVE_DATA_DIR,'Derived','network','all2all_backbone_alpha{alpha}.gexf')
+ALL2ALL_BACKBONE_GRAPH = osjoin(DERIVE_DATA_DIR,'Derived','network','all2all_backbone_alpha{alpha}.graphml')
+
 
 #Plots
 CNTRY_FUND_FRAC_PLOT = osjoin(FIG_DIR, 'cntry_funding_frac.pdf')
@@ -68,9 +70,9 @@ PUB_CHANGE_GLOBAL_PLOT = osjoin(FIG_DIR, 'dependence_NoForeignFund','pub_change_
 PUB_REDUCTION_TOP_PLOT = osjoin(FIG_DIR, 'pub_reduction_by_top10.pdf')
 PROFILECHANGE_TOP_PLOT = osjoin(FIG_DIR, 'profilechange_by_top10.pdf')
 #get top20 countries
-df = pd.read_csv(PUB_NOFOREIGN_TOP20)
-top20list = df.srce_cntry.unique()
 INFLUENCIAL_AREA_PLOT = osjoin(FIG_DIR, "influence_area", "{cntry}.pdf")
+BACKBONE_PLOT = osjoin(FIG_DIR, 'network','backbone_all_alpha{alpha}.pdf')
+BACKBONE_INDIVIDUAL_CNTRY_PLOT = osjoin(FIG_DIR,'network','individual_cntry','{alpha}','{cntry}.pdf')
 
 #include rules
 include: "Snakefile_dataclean.smk"
@@ -79,6 +81,11 @@ include: "Snakefile_intensity.smk"
 include: "Snakefile_dependence.smk"
 include: "Snakefile_impact.smk"
 
+
+#wildcards
+df = pd.read_csv(PUB_NOFOREIGN_TOP20)
+top20list = df.srce_cntry.unique()
+alphas = ["001","002","0005"]
 
 
 rule all:
@@ -101,7 +108,10 @@ rule all:
         expand(INFLUENCIAL_AREA_PLOT, cntry=top20list),
         FUNDING_UNIT_FLOW,
         PUB_NOFOREIGN_ALL2ALL,
-        ALL2ALL_BACKBONE_ALPHA0005
+        expand(ALL2ALL_BACKBONE_ALPHA, alpha=alphas),
+        expand(BACKBONE_PLOT, alpha=alphas),
+        expand(BACKBONE_INDIVIDUAL_CNTRY_PLOT, alpha='0005', cntry=top20list)
+
         
 
 #rule paper:

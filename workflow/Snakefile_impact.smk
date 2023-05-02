@@ -110,7 +110,7 @@ rule extract_backbone_all2all:
         cntry_region = CNTRY_REGION_DATA,
         cntry_fund_frac = CNTRY_FUND_FRAC,
     output:
-        backbone_net = ALL2ALL_BACKBONE_ALPHA0005
+        backbone_net = ALL2ALL_BACKBONE_ALPHA
     shell:
         """
         papermill scripts/extract_backbone.ipynb \
@@ -119,6 +119,25 @@ rule extract_backbone_all2all:
             -p cntry_region_path {input.cntry_region} \
             -p fund_frac_path {input.cntry_fund_frac} \
             -p backbone_net_path {output.backbone_net}
+        """  
+        
+rule plot_backbone_all2all:
+    input:
+        graph_file = ALL2ALL_BACKBONE_GRAPH
+    output:
+        plot = BACKBONE_PLOT
+    shell:
+        """
+        papermill scripts/draw_network_all.ipynb \
+            scripts/outputs/draw_network_all.ipynb \
+            -p path {input.graph_file} \
+            -p plot_path {output.plot} 
+        """        
 
-        """    
-       
+rule plot_backbone_individual_cntry:
+    input:
+        ALL2ALL_BACKBONE_GRAPH
+    output: 
+        BACKBONE_INDIVIDUAL_CNTRY_PLOT
+    shell:
+        'python scripts/draw_network_individual_cntry.py {input} "{output[0]}"'
