@@ -63,7 +63,7 @@ def derive_labelsize(node_size_list,labelsize_min=7, labelsize_max=12):
     
     return scaled_numbers
 
-def plot_network(g, node_pos, node_size, node_color, edge_color, label_size):
+def plot_network(g, node_pos, node_size, node_color, edge_color, label_size, nodelist):
     # set the default font family to Helvetica
     rcParams['font.family'] = 'sans-serif'
     rcParams['font.sans-serif'] = ['DejaVu Sans']
@@ -83,7 +83,7 @@ def plot_network(g, node_pos, node_size, node_color, edge_color, label_size):
                            alpha=0.4,
                            min_source_margin=0,
                            min_target_margin=0)
-    texts = [ax.text(g.nodes[node]['x'],g.nodes[node]['y'], node, size=label_size[ind], color='#0C0000') for ind, node in enumerate(list(g.nodes()))]
+    texts = [ax.text(g.nodes[node]['x'],g.nodes[node]['y'], node, size=label_size[ind], color='#0C0000') for ind, node in enumerate(nodelist)]
     #adjust_text(texts)
 
     plt.subplots_adjust(top = 1, bottom = 0, right = 1, left = 0, 
@@ -116,8 +116,15 @@ if __name__ == "__main__":
     nodelist, edgelist = return_node_edge(g, cntry)
     edge_color = return_edge_color(g, edgelist,region2color)
     node_pos, node_size, node_color = return_node_attr(g, nodelist, region2color)
-    label_size = derive_labelsize(node_size)
     
-    fig,ax = plot_network(g, node_pos, node_size, node_color, edge_color, label_size)
+    label_size=[]
+    for node in nodelist:
+        label_size.append(g.out_degree(node)*3+10)
+    if len(label_size)>1: #the node has out-degree neighbors
+        label_size = derive_labelsize(label_size)
+    else:
+        label_size=[10]
+    
+    fig,ax = plot_network(g, node_pos, node_size, node_color, edge_color, label_size, nodelist)
     
     plt.savefig(plot_path,bbox_inches='tight')
