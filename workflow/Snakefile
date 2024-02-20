@@ -46,10 +46,14 @@ PUB_DATA = osjoin(DERIVE_DATA_DIR, 'CleanedRawData', 'pub.pkl')
 CNTRY_FUND_FRAC = osjoin(DERIVE_DATA_DIR, 'Derived', 'cntry_fund_frac.csv')
 #Research profile without international funding
 PUB_NOINT_FUND_FILE = osjoin(DERIVE_DATA_DIR, 'Derived','dependence','pub_noint_fund.csv')
+#Research profile without exclusive international funding where domestic and international funded paper are retained
+PUB_NO_EXCLUSIVE_INT_FUND_FILE = osjoin(DERIVE_DATA_DIR, 'Derived','dependence','pub_no_exclusive_int_fund.csv')
 #number of publication of countries using full counting assignment
 CNTRY_AUTHOR_FULL = osjoin(DERIVE_DATA_DIR, 'Derived', 'cntry_author_full.csv')
 #country's research profile without publications that are funded by the top20 countries
 PUB_NOFOREIGN_TOP20 = osjoin(DERIVE_DATA_DIR, 'Derived','dependence', 'pub_noforeign_fund_top20.csv')
+#country's research profile without publications that are exclusively funded by the top20 countries
+PUB_NOFOREIGN_EXCLUSIVE_TOP20 = osjoin(DERIVE_DATA_DIR, 'Derived','dependence', 'pub_noforeign_exclusive_fund_top20.csv')
 #Funding units flow between countries
 FUNDING_UNIT_FLOW = osjoin(DERIVE_DATA_DIR, 'Derived', 'funding_unit_flow.csv')
 #publication reduction of countries if all of countries are removed iteratively
@@ -57,6 +61,9 @@ PUB_NOFOREIGN_ALL2ALL = osjoin(DERIVE_DATA_DIR, 'Derived', 'dependence','pub_nof
 #backbone network of the publication reduction of all countries to all countries with the alpha equals 0.005
 ALL2ALL_BACKBONE_ALPHA = osjoin(DERIVE_DATA_DIR,'Derived','network','all2all_backbone_alpha{alpha}.gexf')
 ALL2ALL_BACKBONE_GRAPH = osjoin(DERIVE_DATA_DIR,'Derived','network','all2all_backbone_alpha{alpha}.graphml')
+#funding intensity portfolio of outlier countries
+FUNDING_PORTFOLIO_OUTLIER = osjoin(FIG_DIR, 'funding_portfolio_outlier.csv')
+
 
 
 #Plots
@@ -66,9 +73,13 @@ FUNDING_INTENSITY_OVERALL_PLOT = osjoin(FIG_DIR,'funding_intensity_overall.pdf')
 FUNDING_PORTFOLIO_PLOT = osjoin(FIG_DIR, 'funding_portfolio.pdf')
 FUNDING_INTENSITY_SELF_PLOT = osjoin(FIG_DIR,'funding_intensity_self.pdf')
 PUB_REDUCTION_GLOBAL_PLOT = osjoin(FIG_DIR, 'dependence_NoForeignFund','pub_reduction_global.pdf')
+PUB_REDUCTION_NO_EXCLUSIVE_FOREIGN_GLOBAL_PLOT = osjoin(FIG_DIR, 'dependence_NoForeignFund','pub_reduction_no_exclusive_foreign_global.pdf')
 PUB_CHANGE_GLOBAL_PLOT = osjoin(FIG_DIR, 'dependence_NoForeignFund','pub_change_global.pdf')
+PUB_CHANGE_NO_EXCLUSIVE_GLOBAL_PLOT = osjoin(FIG_DIR, 'dependence_NoForeignFund','pub_change_no_exclusive_global.pdf')
 PUB_REDUCTION_TOP_PLOT = osjoin(FIG_DIR, 'pub_reduction_by_top10.pdf')
 PROFILECHANGE_TOP_PLOT = osjoin(FIG_DIR, 'profilechange_by_top10.pdf')
+PUB_REDUCTION_EXCLUSIVE_TOP_PLOT = osjoin(FIG_DIR, 'pub_reduction_exclusive_by_top10.pdf')
+PROFILECHANGE_EXCLUSIVE_TOP_PLOT = osjoin(FIG_DIR, 'profilechange_exclusive_by_top10.pdf')
 #get top20 countries
 INFLUENCIAL_AREA_PLOT = osjoin(FIG_DIR, "influence_area", "{cntry}.pdf")
 BACKBONE_PLOT = osjoin(FIG_DIR, 'network','backbone_all_alpha{alpha}.pdf')
@@ -97,14 +108,20 @@ rule all:
         GLOBAL_FUND_PLOT,
         FUNDING_INTENSITY_OVERALL_PLOT,
         FUNDING_PORTFOLIO_PLOT,
+        FUNDING_PORTFOLIO_OUTLIER,
         FUNDING_INTENSITY_SELF_PLOT,
         PUB_NOINT_FUND_FILE,
+        PUB_NO_EXCLUSIVE_INT_FUND_FILE,
         CNTRY_AUTHOR_FULL,
         PUB_REDUCTION_GLOBAL_PLOT,
+        PUB_REDUCTION_NO_EXCLUSIVE_FOREIGN_GLOBAL_PLOT,
         PUB_CHANGE_GLOBAL_PLOT,
+        PUB_CHANGE_NO_EXCLUSIVE_GLOBAL_PLOT,
         PUB_NOFOREIGN_TOP20,
         PUB_REDUCTION_TOP_PLOT,
+        PUB_REDUCTION_EXCLUSIVE_TOP_PLOT,
         PROFILECHANGE_TOP_PLOT,
+        PROFILECHANGE_EXCLUSIVE_TOP_PLOT,
         expand(INFLUENCIAL_AREA_PLOT, cntry=top20list),
         FUNDING_UNIT_FLOW,
         PUB_NOFOREIGN_ALL2ALL,

@@ -45,8 +45,57 @@ rule plot_profilechange_top:
             -p cntry_filter_path {input.pub_noforeign_top} \
             -p flag_path {input.cntry_flag} \
             -p plot_path {output.plot} 
-        """    
-       
+        """  
+        
+rule remove_exclusive_foreignfund_top20:
+    input:
+        pub_data = PUB_DATA,
+        cntry_fund_frac = CNTRY_FUND_FRAC
+    output:
+        pub_noforeign = PUB_NOFOREIGN_EXCLUSIVE_TOP20
+    shell:
+        """
+        papermill scripts/build_profile_without_exclusive_top20.ipynb \
+            scripts/outputs/build_profile_without_exclusive_top20.ipynb \
+            -p pubs_path {input.pub_data} \
+            -p cntry_fund_frac_path {input.cntry_fund_frac} \
+            -p profile_path {output.pub_noforeign}
+        """
+        
+rule plot_pubred_exclusive_funded_by_top:
+    input:
+        cntry_author_full = CNTRY_AUTHOR_FULL,
+        pub_noforeign_top = PUB_NOFOREIGN_EXCLUSIVE_TOP20,
+        cntry_flag = CNTRY_FLAG_DATA
+    output:
+        plot = PUB_REDUCTION_EXCLUSIVE_TOP_PLOT
+    shell:
+        """
+        papermill scripts/plot_pubred_top20.ipynb \
+            scripts/outputs/plot_pubred_top20.ipynb \
+            -p cntry_full_path {input.cntry_author_full} \
+            -p cntry_filter_path {input.pub_noforeign_top} \
+            -p flag_path {input.cntry_flag} \
+            -p plot_path {output.plot} 
+        """ 
+ 
+rule plot_profilechange_exclusive_funded_by_top:
+    input:
+        cntry_author_full = CNTRY_AUTHOR_FULL,
+        pub_noforeign_top = PUB_NOFOREIGN_EXCLUSIVE_TOP20,
+        cntry_flag = CNTRY_FLAG_DATA
+    output:
+        plot = PROFILECHANGE_EXCLUSIVE_TOP_PLOT
+    shell:
+        """
+        papermill scripts/plot_profilechange_top20.ipynb \
+            scripts/outputs/plot_profilechange_top20.ipynb \
+            -p cntry_full_path {input.cntry_author_full} \
+            -p cntry_filter_path {input.pub_noforeign_top} \
+            -p flag_path {input.cntry_flag} \
+            -p plot_path {output.plot} 
+        """  
+
 #rule plot_influentialarea_top:
 #    input:
 #        cntry_author_full = CNTRY_AUTHOR_FULL,
