@@ -63,6 +63,8 @@ ALL2ALL_BACKBONE_ALPHA = osjoin(DERIVE_DATA_DIR,'Derived','network','all2all_bac
 ALL2ALL_BACKBONE_GRAPH = osjoin(DERIVE_DATA_DIR,'Derived','network','all2all_backbone_alpha{alpha}.graphml')
 #funding intensity portfolio of outlier countries
 FUNDING_PORTFOLIO_OUTLIER = osjoin(FIG_DIR, 'funding_portfolio_outlier.csv')
+REGRESSION_TABLE = osjoin(DERIVE_DATA_DIR, 'Derived', 'dependence', funding_unit_flow.csv')
+REGRESSION_RESULT = osjoin(FIG_DIR, 'regression.pdf')
 
 
 
@@ -127,7 +129,9 @@ rule all:
         PUB_NOFOREIGN_ALL2ALL,
         expand(ALL2ALL_BACKBONE_ALPHA, alpha=alphas),
         expand(BACKBONE_PLOT, alpha=alphas),
-        expand(BACKBONE_INDIVIDUAL_CNTRY_PLOT, alpha='0005', cntry=top20list)
+        expand(BACKBONE_INDIVIDUAL_CNTRY_PLOT, alpha='0005', cntry=top20list),
+        expand(REGRESSION_TABLE),
+        expand(REGRESSION_RESULT)
 
         
 

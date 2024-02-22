@@ -113,3 +113,24 @@ rule plot_pub_change_no_exclusive_global:
             -p region_path {input.cntry_region} \
             -p plot_path {output.change_plot}
         """
+        
+rule prepare_regression:
+    input:
+        pubs_path = PUB_DATA
+    output:
+        reg_table_path = REGRESSION_TABLE
+    shell:
+        """
+        papermill scripts/prepare_reg_table.ipynb \
+            scripts/outputs/prepare_reg_table.ipynb \
+            -p pubs_path {input.pubs_path}
+            -p reg_table_path {output.reg_table_path}
+        """
+        
+rule run_regression:
+    input: 
+        REGRESSION_TABLE
+    output: 
+        REGRESSION_RESULT
+    shell:
+        "Rscript scripts/run_regression.r {input} {output}"
