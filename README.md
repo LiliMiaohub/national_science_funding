@@ -4,7 +4,7 @@ Cooperation and interdependence in global science funding
 
 # Reproducing:
 
-Load the provided conda environment, provided in `funding.yml`, using the command `conda env create -f funding.yml`. Then be sure to activate this environment in your working directory using `conda activate myenv`.
+Load the provided conda environment, provided in `funding.yml`, using the command `conda env create -f funding.yml`. Then be sure to activate this environment in your working directory using `conda activate myenv`. To install additional modules in the source code, utilize pip to install the package located in the "libs" folder.
 
 
 You can download the simulated data for this analysis at [here](https://figshare.com/articles/dataset/Cooperation_and_interdependence_in_global_science_funding/25270075). The simulated data comprises 5% of publications used in our analysis, with randomized paper IDs, authorship affiliation countries and randomized funding countries. It is important to note that the simulated dataset is not suitable for reproducing the results presented in the paper; its purpose is solely to validate the source code. For access to the Web of Science dataset used in the main analysis, readers are encouraged to contact Thomson Reuters through the following [URL](http://thomsonreuters.com/en/products-services/scholarly-scientific-research/scholarly-search-and-discovery/web-of-science.html).
