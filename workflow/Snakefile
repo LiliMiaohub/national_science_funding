@@ -20,7 +20,6 @@ DATA_DIR = osjoin(PROJ_DIR, 'Data')
 RAW_DATA_DIR = osjoin(DATA_DIR, 'RawData')
 DERIVE_DATA_DIR = osjoin(DATA_DIR, 'DerivedData')
 ADDITIONAL_DATA_DIR = osjoin(DATA_DIR, 'AdditionalData')
-PAPER_DIR = config["paper_dir"]
 FIG_DIR = osjoin(PROJ_DIR, 'Figs', 'Figs')
 
 #PAPER_SRC, SUPP_SRC = [j(PAPER_DIR, f) for f in ("main.tex", "supp.tex")]
@@ -60,10 +59,10 @@ FUNDING_UNIT_FLOW = osjoin(DERIVE_DATA_DIR, 'Derived', 'funding_unit_flow.csv')
 PUB_NOFOREIGN_ALL2ALL = osjoin(DERIVE_DATA_DIR, 'Derived', 'dependence','pub_noforeign_fund_all2all.csv')
 #backbone network of the publication reduction of all countries to all countries with the alpha equals 0.005
 ALL2ALL_BACKBONE_ALPHA = osjoin(DERIVE_DATA_DIR,'Derived','network','all2all_backbone_alpha{alpha}.gexf')
-ALL2ALL_BACKBONE_GRAPH = osjoin(DERIVE_DATA_DIR,'Derived','network','all2all_backbone_alpha{alpha}.graphml')
+ALL2ALL_BACKBONE_GRAPH = osjoin(ADDITIONAL_DATA_DIR,'all2all_backbone_alpha{alpha}.graphml')
 #funding intensity portfolio of outlier countries
 FUNDING_PORTFOLIO_OUTLIER = osjoin(FIG_DIR, 'funding_portfolio_outlier.csv')
-REGRESSION_TABLE = osjoin(DERIVE_DATA_DIR, 'Derived', 'dependence', funding_unit_flow.csv')
+REGRESSION_TABLE = osjoin(DERIVE_DATA_DIR, 'Derived', 'dependence', 'funding_unit_flow.csv')
 REGRESSION_RESULT = osjoin(FIG_DIR, 'regression.pdf')
 
 
@@ -96,8 +95,7 @@ include: "Snakefile_impact.smk"
 
 
 #wildcards
-df = pd.read_csv(PUB_NOFOREIGN_TOP20)
-top20list = df.srce_cntry.unique()
+top20list = ['China','United States','Japan','Germany','South Korea','United Kingdom','Canada','Spain','EU','France']
 alphas = ["001","002","0005"]
 
 
