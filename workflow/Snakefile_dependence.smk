@@ -123,7 +123,7 @@ rule prepare_regression:
         """
         papermill scripts/prepare_reg_table.ipynb \
             scripts/outputs/prepare_reg_table.ipynb \
-            -p pubs_path {input.pubs_path}
+            -p pubs_path {input.pubs_path} \
             -p reg_table_path {output.reg_table_path}
         """
         
