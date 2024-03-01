@@ -1,6 +1,6 @@
 Cooperation and interdependence in global science funding
 
-**Authors:** Miao, Lili, Vincent Larivière, Feifei Wang, Yong-Yeol Ahn, and Cassidy R. Sugimoto
+**Authors:** Lili Miao, Vincent Larivière, Feifei Wang, Yong-Yeol Ahn, and Cassidy R. Sugimoto
 
 # Reproducing:
 
